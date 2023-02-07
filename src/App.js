@@ -1,24 +1,74 @@
-import logo from './logo.svg';
-import './App.css';
+
+import { useState, useEffect } from "react";
+import { FaAngleDoubleRight } from "react-icons/fa";
+
+const url = 'https://course-api.com/react-tabs-project'
 
 function App() {
+  const [loading, setLoading] = useState(true)
+  const [jobs, setJobs] = useState([])
+  const [value, setValue] = useState(0)
+
+  const fetchJobs = async () => {
+    const response = await fetch(url)
+    const nexJobs = await response.json()
+    setJobs(nexJobs)
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    fetchJobs()
+  }, [])
+
+  if (loading) {
+    return(
+      <section className="section loading">
+        <h1>Loading...</h1>
+      </section>
+    )
+  }
+
+  const { company, dates, duties, title } = jobs[value]
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <section className="section">
+      <div className="title">
+        <h2>Experience</h2>
+        <div className="underline"></div>
+      </div>
+      <div className="jobs-center">
+        {jobs.map((job, index) => {
+          return(
+            <button
+                key={job.index}
+                onClick={() => setValue(index)}
+                className={`job-btn ${index === value && 'active-btn'}`}
+            >
+              {job.company}
+            </button>
+          )
+        })}
+      </div>
+      <article className="job-info">
+        <h3>{title}</h3>
+        <h4>{company}</h4>
+        <p className="job-date">{dates}</p>
+        {jobs.map((job, index) => {
+          return(
+            <div
+                key={index}
+                className="job-desc"
+            >
+              <FaAngleDoubleRight className="job-icon"/>
+              <p>{duties}</p>
+            </div>
+          )
+        })}
+      </article>
+      <button className="btn" type="button">
+        More Info
+      </button>
+    </section>
   );
 }
 
